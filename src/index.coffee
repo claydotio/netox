@@ -1,5 +1,5 @@
 _ = require 'lodash'
-Rx = require 'rx-lite'
+Rx = require 'rxjs'
 URL = require 'url-parse'
 request = require 'clay-request'
 
@@ -31,7 +31,7 @@ module.exports = class Netox
         opts = JSON.parse optsString
 
         requestStreams = new Rx.ReplaySubject(1)
-        requestStreams.onNext Rx.Observable.just res
+        requestStreams.onNext Rx.Observable.of res
         stream = requestStreams.switch()
 
         {stream, requestStreams, url, proxyOpts: opts}
