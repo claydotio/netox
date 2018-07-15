@@ -31,7 +31,7 @@ module.exports = class Netox
         opts = JSON.parse optsString
 
         requestStreams = new Rx.ReplaySubject(1)
-        requestStreams.onNext Rx.Observable.of res
+        requestStreams.next Rx.Observable.of res
         stream = requestStreams.switch()
 
         {stream, requestStreams, url, proxyOpts: opts}
@@ -39,15 +39,15 @@ module.exports = class Netox
       @cache = {}
 
   _invalidateCache: =>
-    @serializationCache.onNext {}
+    @serializationCache.next {}
     @cache = _.transform @cache, (cache, val, key) =>
       {stream, requestStreams, url, proxyOpts} = val
 
       cachedSubject = null
-      requestStreams.onNext @_deferredRequestStream url, proxyOpts, (res) =>
+      requestStreams.next @_deferredRequestStream url, proxyOpts, (res) =>
         nextCache = _.clone @serializationCache.getValue()
         nextCache[key] = res
-        @serializationCache.onNext nextCache
+        @serializationCache.next nextCache
 
       cache[key] = {stream, requestStreams, url, proxyOpts}
     , {}
@@ -116,10 +116,10 @@ module.exports = class Netox
     proxyOpts = @_mergeHeaders opts
 
     requestStreams = new Rx.ReplaySubject(1)
-    requestStreams.onNext @_deferredRequestStream url, proxyOpts, (res) =>
+    requestStreams.next @_deferredRequestStream url, proxyOpts, (res) =>
       nextCache = _.clone @serializationCache.getValue()
       nextCache[cacheKey] = res
-      @serializationCache.onNext nextCache
+      @serializationCache.next nextCache
     stream = requestStreams.switch()
 
     @cache[cacheKey] = {stream, requestStreams, url, proxyOpts}
